@@ -13,7 +13,7 @@
 #endif
 
 static usbd_device *usbd_dev;
-static int usb_running = 0;
+int usb_running = 0;
 
 const struct usb_device_descriptor dev_descr = {
   .bLength = USB_DT_DEVICE_SIZE,
@@ -278,9 +278,10 @@ void init_usb(void) {
 
   usbd_dev = usbd_init(&st_usbfs_v1_usb_driver, &dev_descr, &config, usb_strings, 3, usbd_control_buffer, sizeof(usbd_control_buffer));
   usbd_register_set_config_callback(usbd_dev, hid_set_config);
-  while(1) {
-    usbd_poll(usbd_dev);
-  }
+}
+
+void usb_poll(void) {
+  usbd_poll(usbd_dev);
 }
 
 void usb_write(char* bytes) {

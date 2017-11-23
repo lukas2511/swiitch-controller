@@ -1,0 +1,60 @@
+librfn - A general utility library
+==================================
+
+librfn is a collection of small library utilities collected whilst writing
+"stuff" in C and wondering why I was writing the same type of code over and
+over again.
+
+It is neither organised nor comprehensive. Instead it is a pick 'n choose
+library. If you like the code (and the license) use it. Either by copying the
+raw C files into your application or, perhaps better, but integrating librfn
+into your git project as either a submodule or subtree.
+
+For library documentation see http://daniel-thompson.github.io/librfn .
+
+Building
+--------
+
+Generally speaking librfn expects to be built using the build system of
+whatever project it has been integrated into. It has no real dependancies (even
+the code the assumes a POSIX OS is fairly clearly separated). It does however
+has a simple build system based on the standard GNU autotools in order to allow
+the demos and tests to be run from the librfn repo.
+
+Try:
+
+  ./configure
+  make
+  make check
+  src/fibredemo
+
+If you obtained librfn via git you must generate the configure script and
+Makefile templates first:
+
+  autoreconf -i
+
+Integrating as a sub-module
+---------------------------
+
+Try:
+
+  mkdir mycoolapp && cd mycoolapp && git init .
+  git submodule add https://github.com/daniel-thompson/librfn.git
+
+Integrating as a sub-tree
+-------------------------
+
+Try:
+
+  mkdir mycoolapp && cd mycoolapp && git init .
+  git remote add -f librfn https://github.com/daniel-thompson/librfn.git
+  git subtree add --prefix librfn librfn master --squash
+
+To update to the latest version of librfn:
+
+  git fetch librfn master
+  git subtree pull --prefix librfn librfn master --squash
+
+For some idea of the benefits of subtree over submodule see:
+  http://blogs.atlassian.com/2013/05/alternatives-to-git-submodule-git-subtree/
+
