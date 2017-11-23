@@ -46,8 +46,8 @@ static int main_loop(fibre_t *fibre) {
       // LT and RT are unused
       switch_controller.data.RX = (wiiclassic_controller.data.RX_4_3 << 3 | wiiclassic_controller.data.RX_2_1 << 1 | wiiclassic_controller.data.RX_0) << 3;
       switch_controller.data.RY = wiiclassic_controller.data.RY << 3;
-      switch_controller.data.LX = wiiclassic_controller.data.LX << 3;
-      switch_controller.data.LY = wiiclassic_controller.data.LY << 3;
+      switch_controller.data.LX = wiiclassic_controller.data.LX << 2;
+      switch_controller.data.LY = wiiclassic_controller.data.LY << 2;
       switch_controller.data.A = wiiclassic_controller.data.A;
       switch_controller.data.B = wiiclassic_controller.data.B;
       switch_controller.data.X = wiiclassic_controller.data.X;
