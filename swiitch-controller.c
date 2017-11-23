@@ -29,6 +29,10 @@ static int main_loop(fibre_t *fibre) {
   static uint32_t t;
   uint8_t size;
 
+  for(uint32_t i=0; i<sizeof(switch_controller.bytes); i++) {
+    switch_controller.bytes[i] = 0;
+  }
+
   while(1) {
     // 1ms timeout
     t = time_now() + 1000;
@@ -36,10 +40,6 @@ static int main_loop(fibre_t *fibre) {
     gpio_toggle(GPIOC, GPIO13);
 
     if(usb_running) {
-      for(uint32_t i=0; i<sizeof(switch_controller.bytes); i++) {
-        switch_controller.bytes[i] = 0;
-      }
-
       size = poll_wiiclassic(wiiclassic_controller.bytes);
       if(size == 0) continue;
 
