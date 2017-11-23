@@ -1,5 +1,5 @@
-BINARY = usb-hid
+BINARY = swiitch-controller
 
-#OBJS += ...
+OBJS += usb.o
 
 include lib/libopencm3.stm32f1xx.mk
