@@ -5,7 +5,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include <librfm3/i2c_ctx.h>
 
-#include "wiiclassic.h"
+#include "include/wiiclassic.h"
 
 static void i2c_init(void) {
 	rcc_periph_clock_enable(RCC_GPIOB);

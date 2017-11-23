@@ -7,9 +7,9 @@
 #include <librfn/fibre.h>
 #include <librfn/time.h>
 
-#include "controllers.h"
-#include "usb.h"
-#include "wiiclassic.h"
+#include "include/controllers.h"
+#include "include/usb.h"
+#include "include/wiiclassic.h"
 
 union SwitchController switch_controller;
 union WiiClassicController wiiclassic_controller;
