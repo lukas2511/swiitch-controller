@@ -16,10 +16,22 @@ static void i2c_init(void) {
 	i2c_ctx_init(&ctx, I2C1);
 	i2c_ctx_reset(&ctx);
 	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN, GPIO6 | GPIO7);
+
+	// try to disable encryption
+	i2c_ctx_start(&ctx);
+	i2c_ctx_sendaddr(&ctx, 0x52, 0);
+	i2c_ctx_senddata(&ctx, 0xF0);
+	i2c_ctx_senddata(&ctx, 0x55);
+	i2c_ctx_stop(&ctx);
+
+	i2c_ctx_start(&ctx);
+	i2c_ctx_sendaddr(&ctx, 0x52, 0);
+	i2c_ctx_senddata(&ctx, 0xFB);
+	i2c_ctx_senddata(&ctx, 0x00);
+	i2c_ctx_stop(&ctx);
 }
 
 int poll_wiiclassic(uint8_t *buf) {
-	// TODO: decryption
 	const uint8_t size = 6;
 
 	i2c_ctx_t ctx;
