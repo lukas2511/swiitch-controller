@@ -7,11 +7,12 @@
 #include <librfn/fibre.h>
 #include <librfn/time.h>
 
-#include "controller.h"
+#include "controllers.h"
 #include "usb.h"
 #include "wiiclassic.h"
 
-union Controller controller;
+union SwitchController switch_controller;
+union WiiClassicController wiiclassic_controller;
 
 static int usb_fibre(fibre_t *fibre) {
   PT_BEGIN_FIBRE(fibre);
@@ -28,29 +29,34 @@ static int x = 64;
 static int main_loop(fibre_t *fibre) {
   PT_BEGIN_FIBRE(fibre);
   static uint32_t t;
+  uint8_t size;
+
   while(1) {
-    gpio_toggle(GPIOC, GPIO13);
-
-    if(usb_running) {
-      for(uint32_t i=0; i<sizeof(controller.bytes); i++) {
-        controller.bytes[i] = 0;
-      }
-      // TODO: get controller state
-
-      controller.data.A = 1;
-      controller.data.LX = x;
-      x++;
-      if(x==255) x=0;
-      controller.data.LY = 127;
-      controller.data.RX = 127;
-      controller.data.RY = 127;
-
-      usb_write(controller.bytes);
-    }
-
     // 1ms timeout
     t = time_now() + 1000;
     PT_WAIT_UNTIL(fibre_timeout(t));
+    gpio_toggle(GPIOC, GPIO13);
+
+    if(usb_running) {
+      for(uint32_t i=0; i<sizeof(switch_controller.bytes); i++) {
+        switch_controller.bytes[i] = 0;
+      }
+
+      size = poll_wiiclassic(wiiclassic_controller.bytes);
+      if(size == 0) continue;
+
+      // TODO: parse actual controller state
+
+      switch_controller.data.A = 1;
+      switch_controller.data.LX = x;
+      x++;
+      if(x==255) x=0;
+      switch_controller.data.LY = 127;
+      switch_controller.data.RX = 127;
+      switch_controller.data.RY = 127;
+
+      usb_write(switch_controller.bytes);
+    }
   }
   PT_END();
 }

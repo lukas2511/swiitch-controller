@@ -284,6 +284,6 @@ void usb_poll(void) {
   usbd_poll(usbd_dev);
 }
 
-void usb_write(char* bytes) {
+void usb_write(uint8_t *bytes) {
   usbd_ep_write_packet(usbd_dev, 0x81, bytes, sizeof(bytes));
 }

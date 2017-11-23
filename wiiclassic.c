@@ -16,9 +16,29 @@ static void i2c_init(void) {
 	i2c_ctx_init(&ctx, I2C1);
 	i2c_ctx_reset(&ctx);
 	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN, GPIO6 | GPIO7);
+}
 
-	// TODO
+int poll_wiiclassic(uint8_t *buf) {
+	const uint8_t size = 6;
 
+	i2c_ctx_t ctx;
+	i2c_ctx_init(&ctx, I2C1);
+
+	PT_CALL(&ctx.leaf, i2c_ctx_start(&ctx));
+	if(ctx.err) goto err;
+
+	PT_CALL(&ctx.leaf, i2c_ctx_sendaddr(&ctx, 0x52, size));
+	if(ctx.err) goto err;
+
+	for (int i=0; i<size; i++) {
+		PT_CALL(&ctx.leaf, i2c_ctx_getdata(&ctx, buf + i));
+		if(ctx.err) goto err;
+	}
+	return size;
+
+	err:
+	i2c_ctx_reset(&ctx);
+	return 0;
 }
 
 void init_wiiclassic(void) {

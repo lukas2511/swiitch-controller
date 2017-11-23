@@ -1,4 +1,4 @@
-union Controller {
+union SwitchController {
   struct {
     // buttons
     unsigned int Y : 1;
@@ -28,5 +28,9 @@ union Controller {
     uint8_t RY : 8;
     unsigned int : 8; // vendor specific
   } data;
-  char bytes[8];
+  uint8_t bytes[8];
+};
+
+union WiiClassicController {
+  uint8_t bytes[6];
 };
