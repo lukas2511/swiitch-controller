@@ -19,6 +19,7 @@ static void i2c_init(void) {
 }
 
 int poll_wiiclassic(uint8_t *buf) {
+	// TODO: decryption
 	const uint8_t size = 6;
 
 	i2c_ctx_t ctx;
