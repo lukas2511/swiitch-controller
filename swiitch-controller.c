@@ -64,7 +64,7 @@ static int main_loop(fibre_t *fibre) {
       switch_controller.data.ZL = wiiclassic_controller.data.ZL;
       switch_controller.data.ZR = wiiclassic_controller.data.ZR;
 
-      usb_write(switch_controller.bytes);
+      usb_write(switch_controller.bytes, 8);
     }
   }
   PT_END();

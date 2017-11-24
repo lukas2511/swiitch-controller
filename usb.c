@@ -240,7 +240,7 @@ static void hid_set_config(usbd_device *dev, uint16_t wValue)
   (void)wValue;
   (void)dev;
 
-  usbd_ep_setup(dev, 0x81, USB_ENDPOINT_ATTR_INTERRUPT, 4, NULL);
+  usbd_ep_setup(dev, 0x81, USB_ENDPOINT_ATTR_INTERRUPT, 8, NULL);
 
   usbd_register_control_callback(
       dev,
@@ -284,6 +284,6 @@ void usb_poll(void) {
   usbd_poll(usbd_dev);
 }
 
-void usb_write(uint8_t *bytes) {
-  usbd_ep_write_packet(usbd_dev, 0x81, bytes, sizeof(bytes));
+void usb_write(uint8_t *bytes, uint32_t len) {
+  usbd_ep_write_packet(usbd_dev, 0x81, bytes, len);
 }
