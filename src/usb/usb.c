@@ -67,8 +67,8 @@ struct usb_config_descriptor usb_config = {
 };
 
 static const char *usb_strings[] = {
-  "HORI CO.,LTD.",
-  "HORIPAD S",
+  "LUKAS2511",
+  "FRICKELPAD S",
   "",
 };
 

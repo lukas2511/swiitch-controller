@@ -214,6 +214,7 @@ int _write(int fd, char *ptr, int len)
 				(void) ringbuf_put(&outring, '\r');
 			(void) ringbuf_put(&outring, ptr[i]);
 		}
+		fibre_run_atomic(&output_task.fibre);
 		return 0;
 	}
 

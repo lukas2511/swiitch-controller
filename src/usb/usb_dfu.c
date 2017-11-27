@@ -48,8 +48,6 @@ static int dfu_control_request(usbd_device *dev, struct usb_setup_data *req, uin
   (void)len;
   (void)dev;
 
-  printf("Received DFU request 0x%02x type 0x%02x\n", req->bRequest, req->bmRequestType);
-
   if ((req->bmRequestType != DFU_FUNCTIONAL) || (req->bRequest != DFU_DETACH))
     return 0; /* Only accept class request. */
 
