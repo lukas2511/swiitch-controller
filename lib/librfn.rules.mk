@@ -9,7 +9,7 @@
 # (at your option) any later version.
 #
 
-LIBRFN_DIR = lib/librfn
+LIBRFN_DIR = ../lib/librfn
 
 OBJS += \
 	bitops.o \

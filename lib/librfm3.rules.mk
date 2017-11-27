@@ -9,7 +9,7 @@
 # (at your option) any later version.
 #
 
-LIBRFM3_DIR = lib/librfm3
+LIBRFM3_DIR = ../lib/librfm3
 
 OBJS += \
 	i2c_ctx.o

@@ -6,8 +6,10 @@
 #include <libopencm3/usb/hid.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
-#include "include/config.h"
-#include "include/usb.h"
+
+#include "config.h"
+#include "usb.h"
+
 #include <librfn/fibre.h>
 #include <librfn/time.h>
 
@@ -21,7 +23,7 @@
 #include <librfn/console.h>
 #include <librfn/ringbuf.h>
 #include <libopencm3/usb/cdc.h>
-#include "include/myconsole.h"
+#include "myconsole.h"
 int _write(int file, char *ptr, int len);
 
 static uint8_t outbuf[1024];
