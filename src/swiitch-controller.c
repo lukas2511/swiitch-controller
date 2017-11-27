@@ -10,7 +10,10 @@
 #include <librfn/time.h>
 
 #include "include/controller.h"
-#include "include/usb.h"
+#include "usb.h"
+#include "usb_cdc.h"
+#include "usb_hid.h"
+#include "usb_dfu.h"
 #include "include/wiiclassic.h"
 
 union SwitchController switch_controller;
@@ -27,11 +30,10 @@ static int main_loop(fibre_t *fibre) {
     // 1ms timeout
     t = time_now() + 1000;
     PT_WAIT_UNTIL(fibre_timeout(t));
-    gpio_toggle(GPIOC, GPIO13);
 
     if(usb_running) {
       if(poll_wiiclassic()) {
-        usb_write(switch_controller.bytes, 8);
+        //usb_write(switch_controller.bytes, 8); // TODO: reactivate
       }
     }
   }
@@ -39,17 +41,37 @@ static int main_loop(fibre_t *fibre) {
 }
 static fibre_t main_loop_task = FIBRE_VAR_INIT(main_loop);
 
+static int debug_loop(fibre_t *fibre) {
+  PT_BEGIN_FIBRE(fibre);
+  static uint32_t t;
+
+  while(1) {
+    // 500ms timeout
+    t = time_now() + 500000;
+    PT_WAIT_UNTIL(fibre_timeout(t));
+    gpio_toggle(GPIOC, GPIO13);
+  }
+  PT_END();
+}
+static fibre_t debug_loop_task = FIBRE_VAR_INIT(debug_loop);
+
+
 int main(void) {
   rcc_clock_setup_in_hsi_out_48mhz();
   rcc_periph_clock_enable(RCC_GPIOC);
   gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
 
   time_init();
-
-  init_usb();
-  init_wiiclassic();
   init_myconsole();
 
+  init_usb();
+  init_usb_dfu();
+  init_usb_hid();
+  init_usb_cdc();
+
+  init_wiiclassic();
+
   fibre_run(&main_loop_task);
+  fibre_run(&debug_loop_task);
   fibre_scheduler_main_loop();
 }
