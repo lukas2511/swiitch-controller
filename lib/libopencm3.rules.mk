@@ -212,7 +212,7 @@ else
 	@printf "  FLASH   $<\n"
 	-$(Q)amidi -p hw:multistomp,0,0 --send-hex "f0 60 07 10 4d f7" 2> /dev/null && sleep 1
 	#$(Q)dfu-util -a 0 -d 0483:df11 -s $(DFU_ADDRESS):leave -D $(*).bin
-	$(Q)dfu-util -a 0 -d 0f0d:00c1 -s $(DFU_ADDRESS):leave -D $(*).bin
+	$(Q)dfu-util -a 0 -d 0f0d:00c1 -s $(DFU_ADDRESS):leave -E 1 -D $(*).bin
 endif
 else
 %.flash: %.hex
