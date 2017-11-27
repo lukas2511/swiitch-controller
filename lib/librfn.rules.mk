@@ -20,7 +20,8 @@ OBJS += \
 	regdump.o \
 	ringbuf.o \
 	time_libopencm3.o \
-	util.o
+	util.o \
+	console.o
 
 vpath %.c $(LIBRFN_DIR)/librfn
 vpath %.c $(LIBRFN_DIR)/librfn/libopencm3

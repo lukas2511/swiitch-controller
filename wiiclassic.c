@@ -1,59 +1,19 @@
 #include <stdlib.h>
-
-#include <libopencm3/stm32/i2c.h>
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
-#include <librfm3/i2c_ctx.h>
+#include <libopencm3/cm3/nvic.h>
 
 #include "include/wiiclassic.h"
+#include "include/i2c.h"
 
-static void i2c_init(void) {
-	rcc_periph_clock_enable(RCC_GPIOB);
-	rcc_periph_clock_enable(RCC_I2C1);
-	rcc_periph_clock_enable(RCC_AFIO);
+union WiiClassicController wiiclassic_controller;
 
-	i2c_ctx_t ctx;
-	i2c_ctx_init(&ctx, I2C1);
-	i2c_ctx_reset(&ctx);
-	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN, GPIO6 | GPIO7);
-
-	// try to disable encryption
-	i2c_ctx_start(&ctx);
-	i2c_ctx_sendaddr(&ctx, 0x52, 0);
-	i2c_ctx_senddata(&ctx, 0xF0);
-	i2c_ctx_senddata(&ctx, 0x55);
-	i2c_ctx_stop(&ctx);
-
-	i2c_ctx_start(&ctx);
-	i2c_ctx_sendaddr(&ctx, 0x52, 0);
-	i2c_ctx_senddata(&ctx, 0xFB);
-	i2c_ctx_senddata(&ctx, 0x00);
-	i2c_ctx_stop(&ctx);
-}
-
-int poll_wiiclassic(uint8_t *buf) {
-	const uint8_t size = 6;
-
-	i2c_ctx_t ctx;
-	i2c_ctx_init(&ctx, I2C1);
-
-	PT_CALL(&ctx.leaf, i2c_ctx_start(&ctx));
-	if(ctx.err) goto err;
-
-	PT_CALL(&ctx.leaf, i2c_ctx_sendaddr(&ctx, 0x52, size));
-	if(ctx.err) goto err;
-
-	for (int i=0; i<size; i++) {
-		PT_CALL(&ctx.leaf, i2c_ctx_getdata(&ctx, buf + i));
-		if(ctx.err) goto err;
-	}
-	return size;
-
-	err:
-	i2c_ctx_reset(&ctx);
-	return 0;
+int poll_wiiclassic(void) {
+	return i2c_read(0x52, wiiclassic_controller.bytes, 6);
 }
 
 void init_wiiclassic(void) {
-	i2c_init();
+	init_i2c();
+
+	// try to disable encryption
+	i2c_write(0x52, (uint8_t[]){0xF0, 0x55}, 2);
+	i2c_write(0x52, (uint8_t[]){0xFB, 0x00}, 2);
 }

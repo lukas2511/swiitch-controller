@@ -5,6 +5,8 @@
 #include <libopencm3/stm32/gpio.h>
 
 #include <librfn/fibre.h>
+#include <librfn/console.h>
+#include "include/myconsole.h"
 #include <librfn/time.h>
 
 #include "include/controllers.h"
@@ -12,22 +14,11 @@
 #include "include/wiiclassic.h"
 
 union SwitchController switch_controller;
-union WiiClassicController wiiclassic_controller;
-
-static int usb_fibre(fibre_t *fibre) {
-  PT_BEGIN_FIBRE(fibre);
-  while(1) {
-    usb_poll();
-    PT_YIELD();
-  }
-  PT_END();
-}
-static fibre_t usb_task = FIBRE_VAR_INIT(usb_fibre);
 
 static int main_loop(fibre_t *fibre) {
   PT_BEGIN_FIBRE(fibre);
   static uint32_t t;
-  uint8_t size;
+  static uint8_t size = 0;
 
   for(uint32_t i=0; i<sizeof(switch_controller.bytes); i++) {
     switch_controller.bytes[i] = 0;
@@ -40,7 +31,7 @@ static int main_loop(fibre_t *fibre) {
     gpio_toggle(GPIOC, GPIO13);
 
     if(usb_running) {
-      size = poll_wiiclassic(wiiclassic_controller.bytes);
+      //size = poll_wiiclassic();
       if(size == 0) continue;
 
       // LT and RT are unused
@@ -80,8 +71,8 @@ int main(void) {
 
   init_usb();
   init_wiiclassic();
+  init_myconsole();
 
-  fibre_run(&usb_task);
   fibre_run(&main_loop_task);
   fibre_scheduler_main_loop();
 }
