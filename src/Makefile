@@ -1,6 +1,9 @@
 BINARY = swiitch-controller
 
-OBJS += wiiclassic.o myconsole.o i2c.o
+CONTROLLER ?= wiiclassic
+
+OBJS += myconsole.o i2c.o
+OBJS += $(CONTROLLER).o
 OBJS += usb.o usb_cdc.o usb_dfu.o usb_hid.o
 CPPFLAGS += -I include -I usb/include
 

@@ -14,7 +14,6 @@
 #include "usb_cdc.h"
 #include "usb_hid.h"
 #include "usb_dfu.h"
-#include "include/wiiclassic.h"
 
 union SwitchController switch_controller;
 
@@ -32,8 +31,8 @@ static int main_loop(fibre_t *fibre) {
     PT_WAIT_UNTIL(fibre_timeout(t));
 
     if(usb_running) {
-      if(poll_wiiclassic()) {
-        //usb_write(switch_controller.bytes, 8); // TODO: reactivate
+      if(poll_controller()) {
+        usb_hid_write(switch_controller.bytes, 8);
       }
     }
   }
@@ -65,11 +64,11 @@ int main(void) {
   init_myconsole();
 
   init_usb();
-  init_usb_dfu();
   init_usb_hid();
+  init_usb_dfu();
   init_usb_cdc();
 
-  init_wiiclassic();
+  init_controller();
 
   fibre_run(&main_loop_task);
   fibre_run(&debug_loop_task);

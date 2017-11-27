@@ -1,12 +1,11 @@
 #include <stdlib.h>
 #include <libopencm3/cm3/nvic.h>
 
-#include "include/wiiclassic.h"
-#include "include/i2c.h"
-#include "include/controller.h"
+#include "i2c.h"
+#include "controller.h"
 #include "bitset.h"
 
-int poll_wiiclassic(void) {
+int poll_controller(void) {
   uint8_t buf[6];
   if(i2c_read(0x52, buf, 6) == 6) {
     switch_controller.data.RX = (_GETBITS(buf[0], 0, 2) << 3 | _GETBITS(buf[1], 0, 2) << 1 | _GETBITS(buf[2], 0, 1)) << 3;
@@ -39,7 +38,7 @@ int poll_wiiclassic(void) {
   return 0;
 }
 
-void init_wiiclassic(void) {
+void init_controller(void) {
   init_i2c();
 
   // try to disable encryption
