@@ -9,7 +9,7 @@
 #include "include/myconsole.h"
 #include <librfn/time.h>
 
-#include "include/controllers.h"
+#include "include/controller.h"
 #include "include/usb.h"
 #include "include/wiiclassic.h"
 
@@ -18,7 +18,6 @@ union SwitchController switch_controller;
 static int main_loop(fibre_t *fibre) {
   PT_BEGIN_FIBRE(fibre);
   static uint32_t t;
-  static uint8_t size = 0;
 
   for(uint32_t i=0; i<sizeof(switch_controller.bytes); i++) {
     switch_controller.bytes[i] = 0;
@@ -31,31 +30,9 @@ static int main_loop(fibre_t *fibre) {
     gpio_toggle(GPIOC, GPIO13);
 
     if(usb_running) {
-      //size = poll_wiiclassic();
-      if(size == 0) continue;
-
-      // LT and RT are unused
-      switch_controller.data.RX = (wiiclassic_controller.data.RX_4_3 << 3 | wiiclassic_controller.data.RX_2_1 << 1 | wiiclassic_controller.data.RX_0) << 3;
-      switch_controller.data.RY = wiiclassic_controller.data.RY << 3;
-      switch_controller.data.LX = wiiclassic_controller.data.LX << 2;
-      switch_controller.data.LY = wiiclassic_controller.data.LY << 2;
-      switch_controller.data.A = wiiclassic_controller.data.A;
-      switch_controller.data.B = wiiclassic_controller.data.B;
-      switch_controller.data.X = wiiclassic_controller.data.X;
-      switch_controller.data.Y = wiiclassic_controller.data.Y;
-      switch_controller.data.plus = wiiclassic_controller.data.plus;
-      switch_controller.data.minus = wiiclassic_controller.data.minus;
-      switch_controller.data.home = wiiclassic_controller.data.home;
-      switch_controller.data.dpad_up = wiiclassic_controller.data.dpad_up;
-      switch_controller.data.dpad_down = wiiclassic_controller.data.dpad_down;
-      switch_controller.data.dpad_left = wiiclassic_controller.data.dpad_left;
-      switch_controller.data.dpad_right = wiiclassic_controller.data.dpad_right;
-      switch_controller.data.L = wiiclassic_controller.data.L;
-      switch_controller.data.R = wiiclassic_controller.data.R;
-      switch_controller.data.ZL = wiiclassic_controller.data.ZL;
-      switch_controller.data.ZR = wiiclassic_controller.data.ZR;
-
-      usb_write(switch_controller.bytes, 8);
+      if(poll_wiiclassic()) {
+        usb_write(switch_controller.bytes, 8);
+      }
     }
   }
   PT_END();

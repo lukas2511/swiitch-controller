@@ -30,4 +30,4 @@ union SwitchController {
   } data;
   uint8_t bytes[8];
 };
-
+extern union SwitchController switch_controller;
