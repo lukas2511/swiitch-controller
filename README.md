@@ -19,6 +19,9 @@ or go haywire and build the stm32 board directly into the controller, the possib
 
 Mine has the connector from a broken Wiimote :)
 
+In theory you should be able to connect the 8Bitdo Retro Receiver to this setup,
+making PS3/PS4/Wii Mote and Wii U Pro controllers compatible with the Switch (untested).
+
 ### NES/SNES Controller
 
 The NES/SNES controller should be connected to GPIO A0/DATA, A1/LATCH and A2/CLOCK. Power should just be connected between 3.3V and GND, don't use the 5V output!
