@@ -25,7 +25,10 @@ void i2c_write(uint8_t addr, uint8_t* buf, int len) {
 	PT_CALL(&ctx.leaf, i2c_ctx_stop(&ctx));
 	if(ctx.err) goto err;
 
+	return;
+
 err:
+	gpio_toggle(GPIOB, GPIO5);
 	i2c_ctx_reset(&ctx);
 }
 
@@ -45,6 +48,7 @@ int i2c_read(uint8_t addr, uint8_t* buf, int len) {
 	return len;
 
 err:
+	gpio_toggle(GPIOB, GPIO5);
 	i2c_ctx_reset(&ctx);
 	return -1;
 }
@@ -72,7 +76,7 @@ static pt_state_t console_i2c_read(console_t *c)
 	} else {
 		uint8_t addr = parse_integer(c->argv[1]);
 		int len = parse_integer(c->argv[2]);
-		uint8_t buf[len];
+		uint8_t *buf = malloc(len);
 		fprintf(c->out, "Reading %d bytes from 0x%02x...\n", len, addr);
 
 		i2c_read(addr, buf, len);
@@ -121,6 +125,9 @@ void init_i2c(void) {
 
 	/* GPIO for I2C1 */
 	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN, GPIO6 | GPIO7);
+
+	/* Debug GPIO */
+	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO5);
 
 	console_register(&cmd_i2c_read);
 	console_register(&cmd_i2c_write);
