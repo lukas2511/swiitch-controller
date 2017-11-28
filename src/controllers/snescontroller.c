@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/nvic.h>
 
-#include "include/controller.h"
+#include "controller.h"
 #include <librfn/fibre.h>
 #include <librfn/time.h>
 #include "bitset.h"
@@ -13,10 +14,17 @@
 #define SNES_LATCH GPIO1
 #define SNES_DATA  GPIO0
 
+// the snes controller is missing some important features
+// on the first run of snescontroller_poller it detects if some buttons
+// are pressed, and switches some features around
+// see the code further down for more details
 static bool first_run = 1;
 static bool fake_analog = 0;
 static bool use_zl_for_l = 0;
 static bool use_zr_for_r = 0;
+
+uint8_t controller_state[20] = {0, 0};
+uint8_t controller_state_bytes = 2;
 
 static int snescontroller_poller(fibre_t *fibre) {
   PT_BEGIN_FIBRE(fibre);
@@ -30,8 +38,6 @@ static int snescontroller_poller(fibre_t *fibre) {
   switch_controller.data.RY = 127;
   switch_controller.data.LX = 127;
   switch_controller.data.LY = 127;
-
-  uint8_t buf[2] = {0, 0};
 
   // TODO: read snes controller
   gpio_set(GPIOA, SNES_CLOCK);
@@ -47,17 +53,15 @@ static int snescontroller_poller(fibre_t *fibre) {
   t = t+12;
   PT_WAIT_UNTIL(fibre_timeout(t));
 
-
   for(i=0; i<16; i++) {
     gpio_toggle(GPIOA, SNES_CLOCK);
     t = t+12;
     PT_WAIT_UNTIL(fibre_timeout(t));
 
-
     if(gpio_get(GPIOA, SNES_DATA)) {
-      _CLRBIT(buf[i/8], i % 8);
+      _CLRBIT(controller_state[i/8], i % 8);
     } else {
-      _SETBIT(buf[i/8], i % 8);
+      _SETBIT(controller_state[i/8], i % 8);
     }
 
     gpio_toggle(GPIOA, SNES_CLOCK);
@@ -65,18 +69,18 @@ static int snescontroller_poller(fibre_t *fibre) {
     PT_WAIT_UNTIL(fibre_timeout(t));
   }
 
-  switch_controller.data.A = _GETBIT(buf[1], 0);
-  switch_controller.data.B = _GETBIT(buf[0], 0);
-  switch_controller.data.X = _GETBIT(buf[1], 1);
-  switch_controller.data.Y = _GETBIT(buf[0], 1);
-  switch_controller.data.plus = _GETBIT(buf[0], 3);
-  switch_controller.data.minus = _GETBIT(buf[0], 2);
-  switch_controller.data.dpad_up = _GETBIT(buf[0], 4);
-  switch_controller.data.dpad_down = _GETBIT(buf[0], 5);
-  switch_controller.data.dpad_left = _GETBIT(buf[0], 6);
-  switch_controller.data.dpad_right = _GETBIT(buf[0], 7);
-  switch_controller.data.L = _GETBIT(buf[1], 2);
-  switch_controller.data.R = _GETBIT(buf[1], 3);
+  switch_controller.data.A = _GETBIT(controller_state[1], 0);
+  switch_controller.data.B = _GETBIT(controller_state[0], 0);
+  switch_controller.data.X = _GETBIT(controller_state[1], 1);
+  switch_controller.data.Y = _GETBIT(controller_state[0], 1);
+  switch_controller.data.plus = _GETBIT(controller_state[0], 3);
+  switch_controller.data.minus = _GETBIT(controller_state[0], 2);
+  switch_controller.data.dpad_up = _GETBIT(controller_state[0], 4);
+  switch_controller.data.dpad_down = _GETBIT(controller_state[0], 5);
+  switch_controller.data.dpad_left = _GETBIT(controller_state[0], 6);
+  switch_controller.data.dpad_right = _GETBIT(controller_state[0], 7);
+  switch_controller.data.L = _GETBIT(controller_state[1], 2);
+  switch_controller.data.R = _GETBIT(controller_state[1], 3);
 
   if(first_run) {
     if(switch_controller.data.A) fake_analog = 1; // TODO: use GETBIT
@@ -111,7 +115,6 @@ static int snescontroller_poller(fibre_t *fibre) {
   PT_END();
 }
 static fibre_t snescontroller_poller_task = FIBRE_VAR_INIT(snescontroller_poller);
-
 
 int poll_controller(void) {
   fibre_run_atomic(&snescontroller_poller_task);

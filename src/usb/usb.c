@@ -7,7 +7,6 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 
-#include "config.h"
 #include "usb.h"
 #include "usb_cdc.h"
 

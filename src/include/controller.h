@@ -32,5 +32,7 @@ union SwitchController {
 };
 extern union SwitchController switch_controller;
 
+extern uint8_t controller_state[20];
+extern uint8_t controller_state_bytes;
 void init_controller(void);
 int poll_controller(void);

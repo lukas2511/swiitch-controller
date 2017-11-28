@@ -6,7 +6,6 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 
-#include "config.h"
 #include "usb.h"
 #include "usb_cdc.h"
 
@@ -214,7 +213,7 @@ int _write(int fd, char *ptr, int len)
 				(void) ringbuf_put(&outring, '\r');
 			(void) ringbuf_put(&outring, ptr[i]);
 		}
-		fibre_run_atomic(&output_task.fibre);
+		fibre_run(&output_task.fibre);
 		return 0;
 	}
 
