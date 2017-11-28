@@ -9,33 +9,44 @@
 #include "include/myconsole.h"
 #include "include/i2c.h"
 
-i2c_ctx_t ctx;
-
 void i2c_write(uint8_t addr, uint8_t* buf, int len) {
-	i2c_ctx_start(&ctx);
-	i2c_ctx_sendaddr(&ctx, addr, 0);
+	i2c_ctx_t ctx;
+	i2c_ctx_init(&ctx, I2C1);
+	PT_CALL(&ctx.leaf, i2c_ctx_start(&ctx));
+	if(ctx.err) goto err;
+	PT_CALL(&ctx.leaf, i2c_ctx_sendaddr(&ctx, addr, 0));
+	if(ctx.err) goto err;
+
 	for(int i=0;i<len;i++) {
-		i2c_ctx_senddata(&ctx, buf[i]);
+		PT_CALL(&ctx.leaf, i2c_ctx_senddata(&ctx, buf[i]));
+		if(ctx.err) goto err;
 	}
-	i2c_ctx_stop(&ctx);
+
+	PT_CALL(&ctx.leaf, i2c_ctx_stop(&ctx));
+	if(ctx.err) goto err;
+
+err:
+	i2c_ctx_reset(&ctx);
 }
 
 int i2c_read(uint8_t addr, uint8_t* buf, int len) {
+	i2c_ctx_t ctx;
+	i2c_ctx_init(&ctx, I2C1);
 	PT_CALL(&ctx.leaf, i2c_ctx_start(&ctx));
 	if(ctx.err) goto err;
-
 	PT_CALL(&ctx.leaf, i2c_ctx_sendaddr(&ctx, addr, len));
 	if(ctx.err) goto err;
 
-	for (int i=0; i<len; i++) {
+	for(int i=0;i<len;i++) {
 		PT_CALL(&ctx.leaf, i2c_ctx_getdata(&ctx, buf + i));
 		if(ctx.err) goto err;
 	}
+
 	return len;
 
-	err:
+err:
 	i2c_ctx_reset(&ctx);
-	return 0;
+	return -1;
 }
 
 static int parse_integer(char* bytes) {
@@ -96,12 +107,19 @@ static pt_state_t console_i2c_write(console_t *c)
 static const console_cmd_t cmd_i2c_write = CONSOLE_CMD_VAR_INIT("i2c_write", console_i2c_write);
 
 void init_i2c(void) {
+	/* Enable GPIOB clock. */
 	rcc_periph_clock_enable(RCC_GPIOB);
+
+	/* Enable clocks for I2C1 and AFIO. */
 	rcc_periph_clock_enable(RCC_I2C1);
 	rcc_periph_clock_enable(RCC_AFIO);
 
+	/* initialize the peripheral */
+	i2c_ctx_t ctx;
 	i2c_ctx_init(&ctx, I2C1);
 	i2c_ctx_reset(&ctx);
+
+	/* GPIO for I2C1 */
 	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN, GPIO6 | GPIO7);
 
 	console_register(&cmd_i2c_read);

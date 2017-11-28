@@ -9,6 +9,8 @@ uint8_t controller_state[20] = {0, 0, 0, 0, 0, 0};
 uint8_t controller_state_bytes = 6;
 
 int poll_controller(void) {
+  i2c_write(0x52, (uint8_t[]){0x00}, 1);
+
   if(i2c_read(0x52, controller_state, 6) == 6) {
     switch_controller.data.RX = (_GETBITS(controller_state[0], 0, 2) << 3 | _GETBITS(controller_state[1], 0, 2) << 1 | _GETBITS(controller_state[2], 0, 1)) << 3;
     switch_controller.data.RY = _GETBITS(controller_state[2], 3, 5) << 3;
