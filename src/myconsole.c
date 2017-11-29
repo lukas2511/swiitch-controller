@@ -31,6 +31,14 @@ static pt_state_t console_uptime(console_t *c) {
 }
 static const console_cmd_t cmd_uptime = CONSOLE_CMD_VAR_INIT("uptime", console_uptime);
 
+// reset
+static pt_state_t console_reset(console_t *c) {
+  (void)c;
+  scb_reset_system();
+  return PT_EXITED;
+}
+static const console_cmd_t cmd_reset = CONSOLE_CMD_VAR_INIT("reset", console_reset);
+
 // bootloader
 static pt_state_t console_bootloader(console_t *c) {
   (void)c;
@@ -174,6 +182,7 @@ void init_myconsole(void) {
   console_init(&console, stdout);
   console_register(&cmd_uptime);
   console_register(&cmd_bootloader);
+  console_register(&cmd_reset);
   console_register(&cmd_state);
   fibre_run(&watcher_loop_task);
 }
