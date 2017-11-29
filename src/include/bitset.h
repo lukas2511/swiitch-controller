@@ -14,7 +14,7 @@
 #endif
 
 #ifndef _GETBITS
-#define _GETBITS(c, start, len) (((c << (8-start-1)) & 0xFF) >> (8-len))
+#define _GETBITS(c, start, len) (((c >> start << (8-len)) & 0xFF) >> (8-len))
 #endif
 
 #ifndef _GETBIT
