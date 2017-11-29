@@ -135,6 +135,16 @@ static void print_controller_state(void) {
     for(uint8_t i=0; i<controller_state_bytes; i++) {
       fprintf(console.out, "0x%02x ", controller_state[i]);
     }
+  MOVE_CURSOR(19, 2)
+    fprintf(console.out, "Raw Temp: ");
+    for(uint8_t i=0; i<9; i++) {
+      fprintf(console.out, "0x%02x ", switch_controller.bytes[i]);
+    }
+  MOVE_CURSOR(20, 2)
+    fprintf(console.out, "Raw Output: ");
+    for(uint8_t i=0; i<8; i++) {
+      fprintf(console.out, "0x%02x ", switch_controller.bytes[i]);
+    }
 
   RESET
   MOVE_CURSOR(19, 0)

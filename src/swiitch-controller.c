@@ -32,6 +32,20 @@ static int main_loop(fibre_t *fibre) {
 
     if(usb_running) {
       if(poll_controller()) {
+        // DPAD
+        switch(switch_controller.bytes[8]) {
+          case 0x80: switch_controller.data.HAT = 0x00; break;
+          case 0xA0: switch_controller.data.HAT = 0x01; break;
+          case 0x20: switch_controller.data.HAT = 0x02; break;
+          case 0x60: switch_controller.data.HAT = 0x03; break;
+          case 0x40: switch_controller.data.HAT = 0x04; break;
+          case 0x50: switch_controller.data.HAT = 0x05; break;
+          case 0x10: switch_controller.data.HAT = 0x06; break;
+          case 0x90: switch_controller.data.HAT = 0x07; break;
+          default: switch_controller.data.HAT = 0x08; break;
+        }
+
+        // Send data
         usb_hid_write(switch_controller.bytes, 8);
       }
     }
