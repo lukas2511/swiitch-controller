@@ -56,7 +56,7 @@ struct usb_config_descriptor usb_config = {
   .bLength = USB_DT_CONFIGURATION_SIZE,
   .bDescriptorType = USB_DT_CONFIGURATION,
   .wTotalLength = 0,
-  .bNumInterfaces = 0, // TODO: update
+  .bNumInterfaces = 0,
   .bConfigurationValue = 1,
   .iConfiguration = 0,
   .bmAttributes = 0x80,
@@ -86,8 +86,6 @@ static void set_usb_config(usbd_device *dev, uint16_t wValue)
   for(int i=0; i<num_registered_callbacks; i++) {
     usbd_register_control_callback(dev, registered_callbacks[i].type, registered_callbacks[i].type_mask, registered_callbacks[i].callback);
   }
-
-  // TODO: set config for all modules
 
   usb_running = 1;
 }

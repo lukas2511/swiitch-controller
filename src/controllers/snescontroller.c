@@ -39,7 +39,6 @@ static int snescontroller_poller(fibre_t *fibre) {
   switch_controller.data.LX = 127;
   switch_controller.data.LY = 127;
 
-  // TODO: read snes controller
   gpio_set(GPIOA, SNES_CLOCK);
   gpio_clear(GPIOA, SNES_LATCH);
 
@@ -83,7 +82,7 @@ static int snescontroller_poller(fibre_t *fibre) {
   switch_controller.data.R = _GETBIT(controller_state[1], 3);
 
   if(first_run) {
-    if(switch_controller.data.A) fake_analog = 1; // TODO: use GETBIT
+    if(switch_controller.data.A) fake_analog = 1;
     if(switch_controller.data.L) use_zl_for_l = 1;
     if(switch_controller.data.R) use_zr_for_r = 1;
   }

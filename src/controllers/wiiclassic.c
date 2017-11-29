@@ -41,6 +41,7 @@ int poll_controller(void) {
     i2c_write(0x52, (uint8_t[]){0x00}, 1);
 
     // the nintendo switch has no analog triggers, if it had those probably would be the values
+    // TODO: maybe use slightly pressed trigger in combination with home button as the missing capture button?
     // LT = (_GETBITS(controller_state[2], 1, 2) << 3 | _GETBITS(controller_state[3], 0, 3)) << 3
     // RT = _GETBITS(controller_state[3], 3, 5) << 3
     return 1;
