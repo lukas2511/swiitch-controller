@@ -26,8 +26,8 @@ static int main_loop(fibre_t *fibre) {
   }
 
   while(1) {
-    // 1ms timeout
-    t = time_now() + 1000;
+    // 100us timeout
+    t = time_now() + 100;
     PT_WAIT_UNTIL(fibre_timeout(t));
 
     if(usb_running) {
