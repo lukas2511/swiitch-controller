@@ -4,6 +4,7 @@
 #include "i2c.h"
 #include "controller.h"
 #include "bitset.h"
+#include "librfn/time.h"
 
 uint8_t controller_state[20] = {0, 0, 0, 0, 0, 0};
 uint8_t controller_state_bytes = 6;
@@ -38,6 +39,9 @@ int poll_controller(void) {
     switch_controller.data.B = !_GETBIT(controller_state[5], 6);
     switch_controller.data.ZL = !_GETBIT(controller_state[5], 7);
 
+    uint32_t t = time_now() + 100;
+    while(time_now() < t);
+
     i2c_write(0x52, (uint8_t[]){0x00}, 1);
 
     // the nintendo switch has no analog triggers, if it had those probably would be the values
@@ -53,7 +57,16 @@ int poll_controller(void) {
 void init_controller(void) {
   init_i2c();
 
+  uint32_t t = time_now();
+
   // try to disable encryption
   i2c_write(0x52, (uint8_t[]){0xF0, 0x55}, 2);
+
+  t += 100;
+  while(time_now() < t);
+
   i2c_write(0x52, (uint8_t[]){0xFB, 0x00}, 2);
+
+  t += 100;
+  while(time_now() < t);
 }
