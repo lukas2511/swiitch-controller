@@ -14,11 +14,11 @@ int poll_controller(void) {
     // RX is split over multiple bytes (why?!?)
     // 3 least significant bits always 1 (for now, easiest way to zero-out the virtual analog stick)
     switch_controller.data.RX = ((_GETBITS(controller_state[0], 6, 2) << 3 | _GETBITS(controller_state[1], 6, 2) << 1 | _GETBITS(controller_state[2], 7, 1)) << 3) | 0x07;
-    switch_controller.data.RY = (_GETBITS(controller_state[2], 0, 5) << 3) | 0x07;
+    switch_controller.data.RY = 255 - ((_GETBITS(controller_state[2], 0, 5) << 3) | 0x07);
 
     // 2 least significant bits always 1 (for now, easiest way to zero-out the virtual analog stick)
     switch_controller.data.LX = (_GETBITS(controller_state[0], 0, 6) << 2) | 0x03;
-    switch_controller.data.LY = (_GETBITS(controller_state[1], 0, 6) << 2) | 0x03;
+    switch_controller.data.LY = 255 - ((_GETBITS(controller_state[1], 0, 6) << 2) | 0x03);
 
     // byte 4
     switch_controller.data.R = !_GETBIT(controller_state[4], 1);
